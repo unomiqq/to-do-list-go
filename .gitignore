@@ -1,4 +1,4 @@
-.idea/
+../.idea/
 tasks.json
 tasks.csv
 *.db
