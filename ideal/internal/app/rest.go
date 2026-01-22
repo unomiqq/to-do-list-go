@@ -4,7 +4,7 @@ import (
 	"log"
 	"net/http"
 
-	"ideal-todo/internal/application/use-cases"
+	use_cases "ideal-todo/internal/application/use-cases"
 	"ideal-todo/internal/storage/memory"
 	"ideal-todo/internal/transport/rest"
 )
@@ -35,6 +35,27 @@ func (a *RestApp) Run() {
 			todoHandler.Create(w, r)
 		default:
 			http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
+		}
+	})
+
+	mux.HandleFunc("/todo/", func(w http.ResponseWriter, r *http.Request) {
+		if len(r.URL.Path) > 7 && r.URL.Path[len(r.URL.Path)-5:] == "/done" {
+			if r.Method == http.MethodPut {
+				todoHandler.MarkCompleted(w, r)
+			} else {
+				http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
+			}
+		} else {
+			switch r.Method {
+			case http.MethodGet:
+				todoHandler.Get(w, r)
+			case http.MethodPut:
+				todoHandler.Update(w, r)
+			case http.MethodDelete:
+				todoHandler.Delete(w, r)
+			default:
+				http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
+			}
 		}
 	})
 
