@@ -1,10 +1,21 @@
 package dto
 
-import "ideal-todo/internal/domain"
+import (
+	"ideal-todo/internal/domain"
+	"time"
+)
 
 type CreateTodoDTO struct {
 	Title       string  `json:"title"`
 	Description *string `json:"description,omitempty"`
+	Deadline    *string `json:"deadline,omitempty"`
+}
+
+type UpdateTodoDTO struct {
+	Title       *string `json:"title,omitempty"`
+	Description *string `json:"description,omitempty"`
+	Done        *bool   `json:"done,omitempty"`
+	Deadline    *string `json:"deadline,omitempty"`
 }
 
 type TodoReturnDTO struct {
@@ -12,16 +23,24 @@ type TodoReturnDTO struct {
 	Title       string  `json:"title"`
 	Description *string `json:"description,omitempty"`
 	Done        bool    `json:"done"`
+	Deadline    *string `json:"deadline,omitempty"`
 	CreatedAt   string  `json:"created_at"`
 	UpdatedAt   string  `json:"updated_at"`
 }
 
 func ToDTO(t domain.Todo) (todo TodoReturnDTO) {
+	var deadlineStr *string
+	if t.Deadline != nil {
+		formatted := t.Deadline.Format(time.RFC3339)
+		deadlineStr = &formatted
+	}
+
 	return TodoReturnDTO{
 		ID:          *t.ID,
 		Title:       t.Title,
 		Description: t.Description,
 		Done:        t.Done,
+		Deadline:    deadlineStr,
 		CreatedAt:   t.CreatedAt.String(),
 		UpdatedAt:   t.UpdatedAt.String(),
 	}
